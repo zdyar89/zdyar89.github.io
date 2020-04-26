@@ -1,0 +1,56 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .menu {
+            width: 120px;
+            box-shadow: 0 4px 5px 3px rgba(0, 0, 0, 0.2);
+            position: relative;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    Hello
+    <div class="menu">
+        <ul class="menu-options">
+          <li class="menu-option">Back</li>
+          <li class="menu-option">Reload</li>
+          <li class="menu-option">Save</li>
+          <li class="menu-option">Save As</li>
+          <li class="menu-option">Inspect</li>
+        </ul>
+      </div>
+      <script>
+        const menu = document.querySelector(".menu");
+        let menuVisible = false;
+        
+        const toggleMenu = command => {
+          menu.style.display = command === "show" ? "block" : "none";
+          menuVisible = !menuVisible;
+        };
+        
+        const setPosition = ({ top, left }) => {
+          menu.style.left = `${left}px`;
+          menu.style.top = `${top}px`;
+          toggleMenu("show");
+        };
+        
+        window.addEventListener("click", e => {
+          if(menuVisible)toggleMenu("hide");
+        });
+        
+        window.addEventListener("contextmenu", e => {
+          e.preventDefault();
+          const origin = {
+            left: e.pageX,
+            top: e.pageY
+          };
+          setPosition(origin);
+          return false;
+        });
+      </script>
+</body>
+</html>

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+{% load static %}
+
+<head>
+	<title>SmartNotes</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" type="text/css" href="{% static 'css/newstyle.css'%}" />
+	<script src="https://kit.fontawesome.com/ff1a741d62.js" crossorigin="anonymous"></script>
+	<script src="{% static 'js/loadclip().js' %} "></script>
+
+	<script type="text/javascript">
+		// The Browser API key obtained from the Google API Console.
+		// Replace with your own Browser API key, or your own key.
+		var developerKey = "AIzaSyAzg8A4nfj50NqRUW0F2U9bV3GmyfXetZk";
+  
+		// The Client ID obtained from the Google API Console. Replace with your own Client ID.
+		var clientId =
+		  "590624056982-pb8bisjtm3pg3iojnhhe0jt1bosh71kf.apps.googleusercontent.com";
+  
+		// Replace with your own project number from console.developers.google.com.
+		// See "Project number" under "IAM & Admin" > "Settings"
+		var appId = "590624056982";
+  
+		// Scope to use to access user's Drive items.
+		var scope = "https://www.googleapis.com/auth/drive.readonly";
+  
+		var pickerApiLoaded = false;
+		var oauthToken;
+  
+		// Use the Google API Loader script to load the google.picker script.
+		function loadPicker() {
+		  gapi.load("auth", { callback: onAuthApiLoad });
+		  gapi.load("picker", { callback: onPickerApiLoad });
+		}
+  
+		function onAuthApiLoad() {
+		  window.gapi.auth.authorize(
+			{
+			  client_id: clientId,
+			  scope: scope,
+			  immediate: false
+			},
+			handleAuthResult
+		  );
+		}
+  
+		function onPickerApiLoad() {
+		  pickerApiLoaded = true;
+		  createPicker();
+		}
+  
+		function handleAuthResult(authResult) {
+		  if (authResult && !authResult.error) {
+			oauthToken = authResult.access_token;
+			createPicker();
+		  }
+		}
+  
+		// Create and render a Picker object for searching images.
+		function createPicker() {
+		  if (pickerApiLoaded && oauthToken) {
+			var view = new google.picker.View(google.picker.ViewId.DOCS);
+			view.setMimeTypes("image/png,image/jpeg,image/jpg,text/html,text/plain,audio/mpeg");
+			var picker = new google.picker.PickerBuilder()
+			  .enableFeature(google.picker.Feature.NAV_HIDDEN)
+			  .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
+			  .setAppId(appId)
+			  .setOAuthToken(oauthToken)
+			  .addView(view)
+			  .addView(new google.picker.DocsUploadView())
+			  .setDeveloperKey(developerKey)
+			  .setCallback(pickerCallback)
+			  .build();
+			picker.setVisible(true);
+		  }
+		}
+  
+		// A simple callback implementation.
+		function pickerCallback(data) {
+		  if (data.action == google.picker.Action.PICKED) {
+			var fileId = data.docs[0].id;
+			alert("The user selected: " + fileId);
+		  }
+		}
+	  </script>
+</head>
+<style type="text/css">
+	
+	#div1 {width:350px;height:70px;padding:10px;border:1px solid #aaaaaa;}
+
+	.textarea {
+		width: 660px;
+		height: 350px;
+		border-radius: 3px;
+		border-color: black;
+		border-style: solid;
+	}
+</style>
+<body class="is-preload">
+	<!-- Navigation bar on right side -->
+	<section id="header">
+		<body id="background">
+		<header>
+			<span class="image avatar"><img src="{% static "images/images.png" %}" alt="" /></span>
+			{% block content %}
+			<h1 id="logo"><i>Smart Notes</i></h1>
+			{% endblock %}
+			<p>Welcome Back</p>
+		</header>
+	</body>
+		<nav id="nav">
+			<ul>
+				<li><a href="#one" class="active">File Selector</a></li>
+				<li><a href="#two">File Transcriber</a></li>
+				<li><a href="#three">Query Selector</a></li>
+			</ul>
+		</nav>
+		<footer>
+			<ul class="icons">
+				<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+				<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+				<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+				<li><a href="#" class="icon brands fa-github"><span class="label">Github</span></a></li>
+				<li><a href="#" class="icon brands fa-google"><span class="label">Google</span></a></li>
+			</ul>
+		</footer>
+	</section>
+
+	<!-- Wrapper that holds the three sections -->
+	<div id="wrapper">
+		<!-- Main -->
+		<div id="main">
+
+			<!-- Section One: File Selector Section -->
+
+			<section id="one">
+					<h2>1. Select your file</h2>
+					<textarea id='fileLoaderBox' class="draggable" style="width: 80%; height: 400px; border-radius: 3px; border-color: black; border-style: solid;" contenteditable="true">Example Text</textarea>
+					<tr>
+					  <pre id="content" style="white-space: pre-wrap;"></pre>
+					  <td>Select a File to Load:</td>
+					  <td><input value="Ch" type="file" id="fileToLoad"></td>
+					  <td><button onclick="loadFileAsText()">Load Selected File</button><td>
+					  <td><button type="button" id="auth">Select from Google Drive</button></td>
+					</tr>
+					<div class='droppers' id='keywords' contenteditable='true' data-text="Highlighted words/text will go here">
+					</div>
+			</div>
+				<div class="container">
+					<header class="major">
+						<h2>First: Select Your Audio File</h2>
+						<p> In this section, you may choose to upload an audio file recorded with your mobile
+							application, or select an audio file from your google drive</p>
+					</header>
+					<ul class="actions fit">
+						
+						<li>
+							<form method="post" enctype="multipart/form-data" name="submitfile">
+								{% comment %} {% csrf_token %} {% endcomment %}
+								<label for="file-upload" class="button primary fit">
+									Upload File
+								</label>
+								<input id="file-upload" type="file" name="audiofile">
+								<button type="submit" class="button primary fit" value = "file" name="submitfile" >Submit File</button>
+							</form>
+						</li>
+						<li><button type="button" id="auth">Select from Google Drive</button>
+						</li>
+					</ul>
+					<br>
+					<p> Current File: </p>
+					<p> File Format: </p>
+			</section>
+			<!-- Section Two: File Transcriber Section -->
+			
+			<!-- Section Three: Query Parameter Section -->
+			<section id="three">
+				<div class="container">
+					<header class="major">
+						<h2>Lastly: Get Your Resources</h2>
+						<p> description of this section</p>
+					</header>
+					<ul class="actions">
+						<li><button onclick="loadclip()">Search</button></li>
+						<li><a href="#" class="button">Save to Drive</a></li>
+					</ul>
+					<div class="col-12"><textarea name="message" id="message"
+							placeholder="Highlighted words/text will go here" rows="6"></textarea></div>
+				</div>
+			</section>
+			</section>
+			<!-- Footer -->
+			
+		</div>
+		</section>
+		<!-- Jquery to make it dynamic -->
+		<script src="{% static 'js/jquery.min.js' %} "></script>
+		<script src="{% static 'js/jquery.scrollex.min.js' %} "></script>
+		<script src="{% static 'js/jquery.scrolly.min.js' %} "></script>
+		<script src="{% static 'js/browser.min.js' %} "></script>
+		<script src="{% static 'js/breakpoints.min.js' %} "></script>
+		<script src="{% static 'js/util.js' %} "></script>
+		<script src="{% static 'js/main.js' %} "></script>
+		<script src="{% static 'js/loadFileAsText().js' %} "></script>
+		<script>
+			window.addEventListener('DOMContentLoaded', splitWords, false);
+		  
+			function splitWords() {
+		  
+			  var elems = document.querySelectorAll('.draggable'),
+				  text,
+				  textNode,
+				  words,
+				  elem;
+		  
+			  // iterate through all .draggable elements
+			  for (var i = 0, l = elems.length; i < l; i++) {
+		  
+				  elem = elems[i]; 
+				  textNode = elem.childNodes[0];
+				  text = textNode.nodeValue;
+		  
+				  // remove current text node
+				  elem.removeChild(textNode);      
+				  words = text.split(' ');
+		  
+				// iterate through words
+				for (var k = 0, ll = words.length; k < ll; k++) {
+				   // create node for all words
+				   textNode = document.createElement('span');
+				   textNode.id = 'word_' + i + k;
+				   // allow dragging for words
+				   textNode.draggable = true;
+				   textNode.ondragstart = drag;
+				   textNode.appendChild(document.createTextNode(words[k] + ' '));
+				   elem.appendChild(textNode)
+				}
+		   
+			  }
+			  
+			}
+			
+		  function allowDrop(ev)
+		  {
+		  ev.preventDefault();
+		  }
+		  
+		  function drag(ev)
+		  {
+		  ev.dataTransfer.setData("Text",ev.target.id);
+			console.log('targetid: ' + ev.target.id);
+		  }
+		  
+		  function drop(ev)
+		  {
+		  ev.preventDefault();
+		  var data=ev.dataTransfer.getData("Text");
+		  ev.target.appendChild(document.getElementById(data));
+		  }
+		</script>
+		<script type="text/javascript">
+
+            var myLink = document.getElementById('auth');
+            
+            myLink.onclick = function(){
+            
+                var script = document.createElement("script");
+                script.type = "text/javascript";
+                script.src = "https://apis.google.com/js/api.js?onload=loadPicker"; 
+                document.getElementsByTagName("head")[0].appendChild(script);
+                return false;
+            }
+		</script>
+		<script>
+		 const words = document.getElementById('fileLoaderBox').innerText;
+		 const container = document.getElementById('fileLoaderBox');
+		let dragged; 
+
+container.innerHTML = words.split(' ').map(w => `<span class="word" draggable="true">${w}</span>`).join('');
+
+function onDragOver(event) {
+  // Prevent default to allow drop
+  event.preventDefault();
+}
+
+function onDragLeave(event) {
+  event.target.style.background = '';
+}
+
+function onDragEnter(event) {
+  const target = event.target;
+  if (target && dragged && target.classList.contains('drop-zone')) {
+      event.preventDefault();
+      // Set the dropEffect to move
+      event.dataTransfer.dropEffect = 'move'
+      target.style.background = '#1f904e';
+  }
+}
+
+function onDrop(event) {
+  const target = event.target;
+  if (target && dragged && target.classList.contains('drop-zone')) {
+    target.style.backgroundColor = '';
+    event.preventDefault();
+    // Get the id of the target and add the moved element to the target's DOM
+    dragged.parentNode.removeChild(dragged);
+    dragged.style.opacity = '';
+    target.appendChild(dragged);
+  }
+}
+
+function onDragStart(event) {
+    dragged = event.target;
+    event.dataTransfer.setData('text', event.target.id);
+    event.dataTransfer.dropEffect = 'move';
+    // Make it half transparent
+    event.target.style.opacity = .3;
+}
+
+function onDragEnd(event) {
+    // Reset the transparency
+    event.target.style.opacity = ''; // reset opacity when drag ends 
+    dragged = null; 
+}
+
+for (word of document.getElementsByClassName('word')) {
+  word.addEventListener('dragstart', onDragStart);
+  word.addEventListener('dragend', onDragEnd);
+}
+
+for (dropZone of document.getElementsByClassName('drop-zone')) {
+  dropZone.addEventListener('drop', onDrop);
+  dropZone.addEventListener('dragenter', onDragEnter);
+  dropZone.addEventListener('dragleave', onDragLeave);
+  dropZone.addEventListener('dragover', onDragOver);
+}	
+		</script>     
+	</body>
+</html>

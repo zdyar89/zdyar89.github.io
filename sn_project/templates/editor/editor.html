@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/main.css'%}" />
+    <style>
+        .grid-container{
+            display: grid;
+            grid-template-areas:
+            'nav upload process record savetodrive download'
+            'nav editor editor editor editor editor';
+            grid-template-columns: 250px repeat(5, 1fr);
+            grid-template-rows: 250px;
+
+            /* background-image: url("{% static 'images/login_bg.jpeg'%}") ; */
+            
+            
+        }
+        
+        .bg-image{
+            background-image: url("{% static 'images/login_bglighter.jpg'%}");
+            filter: blur(0px);
+            background-repeat: no-repeat;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            
+        }
+
+        .button{
+            margin-right: 25px;
+        }
+
+        .editor{
+            overflow: auto;
+            resize: none;
+            grid-area: editor;
+            height: 100%;
+        }
+        .menu {
+            width: 120px;
+            box-shadow: 0 4px 5px 3px rgba(0, 0, 0, 0.2);
+            position: relative;
+            display: none;
+            left: auto;
+            right: auto;
+            width: 400px;
+        }
+        .menu-options {
+            list-style: none;
+            padding: 10px 0;
+            width: 100px;
+        }
+        .menu-option {
+            font-weight: 500;
+            font-size: 14px;
+            padding: 10px 40px 10px 20px;
+            cursor: pointer;
+            box-shadow: black;
+        }      
+
+
+
+/* 
+        body{
+            background-image: url("{% static 'images/login_bg.jpeg'%}");
+        } */
+
+    </style>
+
+</head>
+<body >
+    <div class="bg-image" style="overflow-y: scroll;">
+        <div class="grid-container">
+
+            <nav style="grid-area: nav; border: 50px;">
+                <button class="button" id="logout">
+                    Logout
+                    <script>
+                        document.getElementById("logout").addEventListener("click", e=> {
+                            window.location = '/';
+                        })        
+                    </script>
+                </button>
+
+            </nav>
+            <button type="button" style="grid-area: upload;" id="auth">
+                Upload Drive File
+                <input type="file" style="display: none;">
+            </button> 
+            <form method="post" enctype="multipart/form-data" name="uploadedfile" id="uploadform">
+                {% csrf_token %}
+                <input type="file" id="BtnBrowseHidden" name="files" style="display: none;" />
+                <button type="button" class="button" for="BtnBrowseHidden" id="upbtn">
+                    {% if filename %}
+                      {{filename}}
+                    {% else %}
+                      Upload Local File
+                    {% endif %}
+                    <script>
+                        function uploadFile(){
+                            document.getElementById("BtnBrowseHidden").click();
+                        }
+                        document.getElementById("upbtn").addEventListener('click',uploadFile);
+                        document.getElementById("BtnBrowseHidden").onchange = function() {
+                            file = document.getElementById("BtnBrowseHidden");
+                            name = file.value.split("\\").pop();
+                            document.getElementById("upbtn").innerHTML = "";
+                            document.getElementById("uploadform").submit()
+                        }
+                    </script>
+                </button>
+            </form>
+            
+
+            <button class="button" style="grid-area: record;">
+                Record Audio
+            </button>
+
+            <button class="button">
+                Save File to Google Drive
+            </button>
+            <div class="editor">
+                <textarea style="margin-right: 300px; font-weight: bold" class="editor" name="editor" id="editor" rows="100" cols="10">{% if text %}{{text}}{% else %}This is where your notes go!{% endif %}
+                </textarea>
+                
+            </div>
+            
+        </div>
+
+    </div>
+        <div class="menu" style="opacity: 1;">
+        <ul class="menu-options" style= "filter: blur(0px);">
+            <button id="googleSearch" style="background-color: black; opacity: .7">
+                Search Google
+                <script>
+                    document.getElementById("googleSearch").addEventListener("click", e=> {
+                        console.log("BUTTON CLICKED");
+                        var text = getSelectionText();
+                        window.open('http://google.com/search?q='+text)
+                    })        
+                </script>
+            </button>
+            <button id="quizletSearch" style="background-color: black; opacity: .7">
+                Search Quizlet
+                <script>
+                    document.getElementById("quizletSearch").addEventListener("click", e=> {
+                        console.log("BUTTON CLICKED");
+                        var text = getSelectionText();
+                        window.open('https://quizlet.com/subject/'+text)
+                    })        
+                </script>
+            </button>
+            <button id="stackOverflowSearch" style="background-color: black; opacity: .7">
+                search stack overflow
+                <script>
+                    document.getElementById("stackOverflowSearch").addEventListener("click", e=> {
+                        console.log("BUTTON CLICKED");
+                        var text = getSelectionText();
+                        window.open('https://stackoverflow.com/search?q='+text)
+                    })        
+                </script>
+            </button>
+            <button id="githubSearch" style="background-color: black; opacity: .7">
+                search github
+                <script>
+                    document.getElementById("githubSearch").addEventListener("click", e=> {
+                        console.log("BUTTON CLICKED");
+                        var text = getSelectionText();
+                        window.open('https://github.com/search?q='+text)
+                    })        
+                </script>
+            </button>
+            <button id="wikiSearch" style="background-color: black; opacity: .7">
+                search wikipedia
+                <script>
+                    document.getElementById("wikiSearch").addEventListener("click", e=> {
+                        console.log("BUTTON CLICKED");
+                        var text = getSelectionText();
+                        window.open('https://en.wikipedia.org/?search='+text)
+                    })        
+                </script>
+            </button>
+        </button>
+        <button id="twitterSearch" style="background-color: black; opacity: .7">
+            search twitter
+            <script>
+                document.getElementById("twitterSearch").addEventListener("click", e=> {
+                    console.log("BUTTON CLICKED");
+                    var text = getSelectionText();
+                    window.open('https://twitter.com/search?q='+text)
+                })        
+            </script>
+        </button>
+
+
+
+        </ul>
+      </div>
+    <script>
+        const menu = document.querySelector(".menu");
+        let menuVisible = false;
+        
+        const toggleMenu = command => {
+          menu.style.display = command === "show" ? "block" : "none";
+          menuVisible = !menuVisible;
+        };
+        
+        const setPosition = ({ top, left }) => {
+          menu.style.left = `${left}px`;
+          menu.style.top = `${top}px`;
+          toggleMenu("show");
+        };
+        
+        window.addEventListener("click", e => {
+          if(menuVisible)toggleMenu("hide");
+        });
+        
+        window.addEventListener("contextmenu", e => {
+          e.preventDefault();
+          const origin = {
+            left: e.pageX,
+            top: e.pageY
+          };
+          setPosition(origin);
+          return false;
+        });
+        function getSelectionText() {
+            var text = "";
+            if (window.getSelection) {
+                text = window.getSelection().toString();
+            } else if (document.selection && document.selection.type != "Control") {
+                text = document.selection.createRange().text;
+            }
+            return text;
+        }
+
+    </script>
+    <script type="text/javascript">
+		// The Browser API key obtained from the Google API Console.
+		// Replace with your own Browser API key, or your own key.
+		var developerKey = "AIzaSyAzg8A4nfj50NqRUW0F2U9bV3GmyfXetZk";
+  
+		// The Client ID obtained from the Google API Console. Replace with your own Client ID.
+		var clientId =
+		  "590624056982-pb8bisjtm3pg3iojnhhe0jt1bosh71kf.apps.googleusercontent.com";
+  
+		// Replace with your own project number from console.developers.google.com.
+		// See "Project number" under "IAM & Admin" > "Settings"
+		var appId = "590624056982";
+  
+		// Scope to use to access user's Drive items.
+		var scope = "https://www.googleapis.com/auth/drive.readonly";
+  
+		var pickerApiLoaded = false;
+		var oauthToken;
+  
+		// Use the Google API Loader script to load the google.picker script.
+		function loadPicker() {
+		  gapi.load("auth", { callback: onAuthApiLoad });
+		  gapi.load("picker", { callback: onPickerApiLoad });
+		}
+  
+		function onAuthApiLoad() {
+		  window.gapi.auth.authorize(
+			{
+			  client_id: clientId,
+			  scope: scope,
+			  immediate: false
+			},
+			handleAuthResult
+		  );
+		}
+  
+		function onPickerApiLoad() {
+		  pickerApiLoaded = true;
+		  createPicker();
+		}
+  
+		function handleAuthResult(authResult) {
+		  if (authResult && !authResult.error) {
+			oauthToken = authResult.access_token;
+			createPicker();
+		  }
+		}
+  
+		// Create and render a Picker object for searching images.
+		function createPicker() {
+		  if (pickerApiLoaded && oauthToken) {
+			var view = new google.picker.View(google.picker.ViewId.DOCS);
+			view.setMimeTypes("image/png,image/jpeg,image/jpg,text/html,text/plain,audio/mpeg");
+			var picker = new google.picker.PickerBuilder()
+			  .enableFeature(google.picker.Feature.NAV_HIDDEN)
+			  .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
+			  .setAppId(appId)
+			  .setOAuthToken(oauthToken)
+			  .addView(view)
+			  .addView(new google.picker.DocsUploadView())
+			  .setDeveloperKey(developerKey)
+			  .setCallback(pickerCallback)
+			  .build();
+			picker.setVisible(true);
+		  }
+		}
+  
+		// A simple callback implementation.
+		function pickerCallback(data) {
+		  if (data.action == google.picker.Action.PICKED) {
+			var fileId = data.docs[0].id;
+			alert("The user selected: " + fileId);
+		  }
+		}
+      </script>
+      <script type="text/javascript">
+
+        var myLink = document.getElementById('auth');
+        
+        myLink.onclick = function(){
+        
+            var script = document.createElement("script");
+            script.type = "text/javascript";
+            script.src = "https://apis.google.com/js/api.js?onload=loadPicker"; 
+            document.getElementsByTagName("head")[0].appendChild(script);
+            return false;
+        }
+    </script>
+</body>
+</html> 
+
+<!-- Google
+Quizlet
+github
+stackoverflow
+twitter -->

@@ -1,0 +1,78 @@
+{% load static %} {% load socialaccount %} {% providers_media_js %}
+
+<html>
+  <head>
+    <title>Login Page</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'css/style_login.css'%}"
+    />
+    <meta
+      name="google-signin-client_id"
+      content="590624056982-pb8bisjtm3pg3iojnhhe0jt1bosh71kf.apps.googleusercontent.com"
+    />
+  </head>
+  <body>
+    <div class="title">
+      <h1>Smart Notes</h1>
+    </div>
+    <div class="loginbox">
+      <button
+        style="
+          width: 255px;
+          height: 60px;
+          margin-bottom: 15px;
+          background-color: lightgreen;
+          opacity: 1;
+          border-radius: 3em;
+          cursor: pointer;
+        "
+      >
+        <a href="{% provider_login_url 'google' %}">Login with Google</a>
+      </button>
+
+      <button
+        style="
+          width: 255px;
+          height: 60px;
+          margin-bottom: 15px;
+          background-color: royalblue;
+          opacity: 1;
+          border-radius: 3em;
+          cursor: pointer;
+        "
+      >
+        <a href="{% url 'social:begin' 'facebook' %}">Login with Facebook </a>
+      </button>
+      <button
+        style="
+          background-color: goldenrod;
+          width: 255px;
+          height: 60px;
+          margin-bottom: 15px;
+          opacity: 1;
+          border-radius: 3em;
+          cursor: pointer;
+        "
+        class="btn btn-info mb-2"
+      >
+        <a href="{% url 'social:begin' 'linkedin-oauth2' %}"
+          >Login with LinkedIn</a
+        >
+      </button>
+      <button
+        style="
+          background-color: palevioletred;
+          height: 60px;
+          opacity: 1;
+          border-radius: 3em;
+          cursor: pointer;
+        "
+        class="btn btn-info mb-2"
+      >
+        <a href="/editor">Continue w/o Authentication</a>
+      </button>
+    </div>
+  </body>
+</html>
