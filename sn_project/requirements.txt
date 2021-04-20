@@ -30,7 +30,7 @@ pluggy==0.13.1
 praw==6.5.1
 prawcore==1.0.1
 psycopg2==2.8.4
-py==1.8.1
+py==1.10.0
 pycparser==2.20
 pylint==2.4.4
 pyOpenSSL==19.1.0
